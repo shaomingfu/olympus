@@ -77,6 +77,11 @@ int item::print()
 
 double item::similarity(const item &e)
 {
+	if(words.size() == 0 || e.words.size() == 0) return 0;
+
+	double s0 = similarity(words[0], e.words[0]);
+	if(s0 < 0.8) return 0;
+
 	int m = words.size();
 	int n = e.words.size();
 	vector< vector<double> > vv;

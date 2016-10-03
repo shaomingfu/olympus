@@ -2,6 +2,8 @@
 #define __GROUP_H__
 
 #include "item.h"
+#include "undirected_graph.h"
+
 #include <vector>
 #include <map>
 
@@ -13,6 +15,7 @@ public:
 	vector<item> items;
 	set<string> fs;
 	MSS rs;
+	undirected_graph gr;
 
 public:
 	int load(const string &file);
@@ -22,5 +25,8 @@ public:
 	int parse();
 	int print();
 };
+
+bool set_compare(const set<int> &s1, const set<int> &s2);
+
 
 #endif

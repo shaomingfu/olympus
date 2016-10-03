@@ -85,14 +85,35 @@ int group::parse()
 
 int group::compare()
 {
+	for(int i = 0; i < items.size(); i++) gr.add_vertex();
+
 	for(int i = 0; i < items.size(); i++)
 	{
 		for(int j = i + 1; j < items.size(); j++)
 		{
 			double s = items[i].similarity(items[j]);
 			if(s <= 0.8) continue;
-			printf("|%s| v.s. |%s| -> similarity = %.2lf\n", items[i].name.c_str(), items[j].name.c_str(), s);
+
+			gr.add_edge(i, j);
+			//printf("|%s| v.s. |%s| -> similarity = %.2lf\n", items[i].name.c_str(), items[j].name.c_str(), s);
 		}
+	}
+
+
+	vector< set<int> > vv = gr.compute_connected_components();
+
+	sort(vv.begin(), vv.end(), set_compare);
+
+	for(int i = 0; i < vv.size(); i++)
+	{
+		set<int> &s = vv[i];
+		for(set<int>::iterator it = s.begin(); it != s.end(); it++)
+		{
+			int k = (*it);
+			printf("GROUP %d: ", i);
+			items[k].print();
+		}
+		printf("\n");
 	}
 	return 0;
 }
@@ -104,4 +125,10 @@ int group::print()
 		items[i].print();
 	}
 	return 0;
+}
+
+bool set_compare(const set<int> &s1, const set<int> &s2)
+{
+	if(s1.size() > s2.size()) return true;
+	else return false;
 }

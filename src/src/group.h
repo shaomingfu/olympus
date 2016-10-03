@@ -21,7 +21,8 @@ public:
 	int load(const string &file);
 	int forbid(const string &file);
 	int replace(const string &file);
-	int compare();
+	int build();
+	int clust();
 	int parse();
 	int print();
 };

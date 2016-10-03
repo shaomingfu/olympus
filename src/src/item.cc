@@ -124,6 +124,12 @@ double item::similarity(const item &e)
 		s2.insert(kj);
 	}
 
+	int min = m < n ? m : n;
+	int max = m > n ? m : n;
+
+	if(sm >= min) return 1.0;
+	if(sm >= max - 0.5) return 1.0;
+
 	double ss = sm / (m > n ? m : n);
 	//if(ss > 0.1) printf("|%s| <-> |%s| -> %.6lf\n", name.c_str(), e.name.c_str(), ss);
 	return ss;

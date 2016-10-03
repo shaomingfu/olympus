@@ -83,7 +83,7 @@ int group::parse()
 	return 0;
 }
 
-int group::compare()
+int group::build()
 {
 	for(int i = 0; i < items.size(); i++) gr.add_vertex();
 
@@ -92,14 +92,18 @@ int group::compare()
 		for(int j = i + 1; j < items.size(); j++)
 		{
 			double s = items[i].similarity(items[j]);
-			if(s <= 0.8) continue;
+			if(s < 0.9) continue;
 
 			gr.add_edge(i, j);
 			//printf("|%s| v.s. |%s| -> similarity = %.2lf\n", items[i].name.c_str(), items[j].name.c_str(), s);
 		}
 	}
 
+	return 0;
+}
 
+int group::clust()
+{
 	vector< set<int> > vv = gr.compute_connected_components();
 
 	sort(vv.begin(), vv.end(), set_compare);

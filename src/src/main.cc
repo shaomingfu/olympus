@@ -9,6 +9,7 @@ int main(int argc, const char ** argv)
 	gr.forbid(argv[2]);
 	gr.replace(argv[3]);
 	gr.parse();
-	gr.compare();
+	gr.build();
+	gr.clust();
 	return 0;
 }

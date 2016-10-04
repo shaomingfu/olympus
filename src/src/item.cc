@@ -80,7 +80,7 @@ double item::similarity(const item &e, int level)
 {
 	if(words.size() == 0 || e.words.size() == 0) return 0;
 
-	if(similarity(words[0], e.words[0]) <= 0.6) return 0;
+	if(similarity(words[0], e.words[0]) <= 0.7) return 0;
 
 	int m = words.size();
 	int n = e.words.size();
@@ -89,11 +89,11 @@ double item::similarity(const item &e, int level)
 	for(int i = 0; i < words.size() && i < e.words.size() && i < level + 1; i++)
 	{
 		double s = similarity(words[i], e.words[i]);
-		if(s < 0.6) break;
+		if(s < 0.7) break;
 		sm += s;
 	}
 
-	if(sm >= level + 0.6) return 1.0;
+	if(sm >= level + 0.7) return 1.0;
 	else return 0;
 
 	assert(false);

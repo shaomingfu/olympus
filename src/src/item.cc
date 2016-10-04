@@ -1,4 +1,5 @@
 #include "item.h"
+#include <cassert>
 #include <cstdlib>
 #include <vector>
 #include <sstream>
@@ -75,12 +76,84 @@ int item::print()
 	return 0;
 }
 
+double item::similarity(const item &e, int level)
+{
+	if(words.size() == 0 || e.words.size() == 0) return 0;
+
+	if(similarity(words[0], e.words[0]) <= 0.6) return 0;
+
+	int m = words.size();
+	int n = e.words.size();
+
+	double sm = 0;
+	for(int i = 0; i < words.size() && i < e.words.size() && i < level + 1; i++)
+	{
+		double s = similarity(words[i], e.words[i]);
+		if(s < 0.6) break;
+		sm += s;
+	}
+
+	if(sm >= level + 0.6) return 1.0;
+	else return 0;
+
+	assert(false);
+
+	vector< vector<double> > vv;
+	vv.resize(m);
+	for(int i = 0; i < m; i++) vv[i].resize(n);
+	for(int i = 0; i < m; i++)
+	{
+		for(int j = 0; j < n; j++)
+		{
+			vv[i][j] = similarity(words[i], e.words[j]);
+		}
+	}
+
+	set<int> s1;
+	set<int> s2;
+	
+	sm = 0;
+	while(true)
+	{
+		int ki = -1;
+		int kj = -1;
+		double x = 0;
+		for(int i = 0; i < m; i++)
+		{
+			if(s1.find(i) != s1.end()) continue;
+			for(int j = 0; j < n; j++)
+			{
+				if(s2.find(j) != s2.end()) continue;
+				if(vv[i][j] < x) continue;
+				x = vv[i][j];
+				ki = i;
+				kj = j;
+			}
+		}
+		if(ki == -1 || kj == -1) break;
+
+		sm += x;
+		s1.insert(ki);
+		s2.insert(kj);
+	}
+
+	int max = m > n ? m : n;
+	if(sm >= max - 0.5) return 1.0;
+
+	return 0;
+}
+
 double item::similarity1(const item &e)
 {
 	if(words.size() == 0 || e.words.size() == 0) return 0;
 
 	double s0 = similarity(words[0], e.words[0]);
 	if(s0 < 0.8) return 0;
+
+	int m = words.size();
+	int n = e.words.size();
+
+	if(words[0] == e.words[0]) return 1.0;
 
 	double sm = 0;
 	for(int i = 0; i < words.size() && i < e.words.size(); i++)
@@ -90,6 +163,51 @@ double item::similarity1(const item &e)
 
 	if(sm >= words.size() - 0.2) return 1.0;
 	if(sm >= e.words.size() - 0.2) return 1.0;
+
+	vector< vector<double> > vv;
+	vv.resize(m);
+	for(int i = 0; i < m; i++) vv[i].resize(n);
+	for(int i = 0; i < m; i++)
+	{
+		for(int j = 0; j < n; j++)
+		{
+			vv[i][j] = similarity(words[i], e.words[j]);
+		}
+	}
+
+	set<int> s1;
+	set<int> s2;
+	
+	sm = 0;
+	while(true)
+	{
+		int ki = -1;
+		int kj = -1;
+		double x = 0;
+		for(int i = 0; i < m; i++)
+		{
+			if(s1.find(i) != s1.end()) continue;
+			for(int j = 0; j < n; j++)
+			{
+				if(s2.find(j) != s2.end()) continue;
+				if(vv[i][j] < x) continue;
+				x = vv[i][j];
+				ki = i;
+				kj = j;
+			}
+		}
+		if(ki == -1 || kj == -1) break;
+
+		sm += x;
+		s1.insert(ki);
+		s2.insert(kj);
+	}
+
+	if(sm >= 1.8 && sm >= words.size() - 0.5) return 1.0;
+	if(sm >= 1.8 && sm >= e.words.size() - 0.5) return 1.0;
+
+	if(sm >= 2.5) return 1.0;
+
 	return 0;
 }
 

@@ -21,9 +21,8 @@ public:
 	int load(const string &file);
 	int forbid(const string &file);
 	int replace(const string &file);
-	int build();
 	int clust();
-	int clust(const vector<int> &v);
+	int clust(const vector<int> &v, int level, string tag);
 	int parse();
 	int print();
 };

@@ -83,46 +83,28 @@ int group::parse()
 	return 0;
 }
 
-int group::build()
-{
-	for(int i = 0; i < items.size(); i++) gr.add_vertex();
-
-	for(int i = 0; i < items.size(); i++)
-	{
-		for(int j = i + 1; j < items.size(); j++)
-		{
-			double s = items[i].similarity1(items[j]);
-			if(s < 0.9) continue;
-
-			gr.add_edge(i, j);
-			//printf("|%s| v.s. |%s| -> similarity = %.2lf\n", items[i].name.c_str(), items[j].name.c_str(), s);
-		}
-	}
-
-	return 0;
-}
-
 int group::clust()
 {
-	vector< set<int> > vv = gr.compute_connected_components();
-
-	sort(vv.begin(), vv.end(), set_compare);
-
-	for(int i = 0; i < vv.size(); i++)
-	{
-		vector<int> v(vv[i].begin(), vv[i].end());
-
-		printf("GROUP %d:\n", i);
-
-		clust(v);
-
-		printf("\n");
-	}
+	vector<int> v;
+	for(int i = 0; i < items.size(); i++) v.push_back(i);
+	clust(v, 0, "GROUP");
 	return 0;
 }
 
-int group::clust(const vector<int> &v)
+int group::clust(const vector<int> &v, int level, string tag)
 {
+	if(level >= 4)
+	{
+		for(int k = 0; k < v.size(); k++)
+		{
+			printf("%s: ", tag.c_str());
+			for(int i = 0; i < 20 - tag.size(); i++) printf(" ");
+			items[v[k]].print();
+		}
+		return 0;
+	}
+
+	//printf("clust level %d with %lu elements\n", level, v.size());
 	undirected_graph ug;
 	for(int i = 0; i < v.size(); i++) ug.add_vertex();
 
@@ -132,7 +114,7 @@ int group::clust(const vector<int> &v)
 		for(int j = i + 1; j < v.size(); j++)
 		{
 			item &e2 = items[v[j]];
-			double s = e1.similarity2(e2);
+			double s = e1.similarity(e2, level);
 			if(s < 0.9) continue;
 			ug.add_edge(i, j);
 			//printf("|%s| v.s. |%s| -> similarity = %.2lf\n", items[i].name.c_str(), items[j].name.c_str(), s);
@@ -143,17 +125,22 @@ int group::clust(const vector<int> &v)
 
 	sort(vv.begin(), vv.end(), set_compare);
 
+
+	level++;
+
 	for(int i = 0; i < vv.size(); i++)
 	{
-		set<int> &s = vv[i];
-		for(set<int>::iterator it = s.begin(); it != s.end(); it++)
+		vector<int> v1(vv[i].begin(), vv[i].end());
+		vector<int> v2;
+		//printf("process %d component with %lu elements\n", i, v1.size());
+		for(int k = 0; k < v1.size(); k++)
 		{
-			int k = v[(*it)];
-			printf(" SUBGROUP %d: ", i);
-			items[k].print();
+			v2.push_back(v[v1[k]]);
 		}
-		printf("\n");
-		//printf("--------------------\n");
+		char buf[10240];
+		sprintf(buf, "%s.%d", tag.c_str(), i + 1);
+		clust(v2, level, buf);
+		if(level == 2) printf("\n");
 	}
 
 	return 0;

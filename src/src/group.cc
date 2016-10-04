@@ -91,7 +91,7 @@ int group::build()
 	{
 		for(int j = i + 1; j < items.size(); j++)
 		{
-			double s = items[i].similarity(items[j]);
+			double s = items[i].similarity1(items[j]);
 			if(s < 0.9) continue;
 
 			gr.add_edge(i, j);
@@ -110,15 +110,52 @@ int group::clust()
 
 	for(int i = 0; i < vv.size(); i++)
 	{
+		vector<int> v(vv[i].begin(), vv[i].end());
+
+		printf("GROUP %d:\n", i);
+
+		clust(v);
+
+		printf("\n");
+	}
+	return 0;
+}
+
+int group::clust(const vector<int> &v)
+{
+	undirected_graph ug;
+	for(int i = 0; i < v.size(); i++) ug.add_vertex();
+
+	for(int i = 0; i < v.size(); i++)
+	{
+		item &e1 = items[v[i]];
+		for(int j = i + 1; j < v.size(); j++)
+		{
+			item &e2 = items[v[j]];
+			double s = e1.similarity2(e2);
+			if(s < 0.9) continue;
+			ug.add_edge(i, j);
+			//printf("|%s| v.s. |%s| -> similarity = %.2lf\n", items[i].name.c_str(), items[j].name.c_str(), s);
+		}
+	}
+
+	vector< set<int> > vv = ug.compute_connected_components();
+
+	sort(vv.begin(), vv.end(), set_compare);
+
+	for(int i = 0; i < vv.size(); i++)
+	{
 		set<int> &s = vv[i];
 		for(set<int>::iterator it = s.begin(); it != s.end(); it++)
 		{
-			int k = (*it);
-			printf("GROUP %d: ", i);
+			int k = v[(*it)];
+			printf(" SUBGROUP %d: ", i);
 			items[k].print();
 		}
 		printf("\n");
+		//printf("--------------------\n");
 	}
+
 	return 0;
 }
 

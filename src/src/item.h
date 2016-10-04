@@ -24,7 +24,8 @@ public:
 public:
 	bool build(const string &s);
 	int parse(const set<string> &fs, MSS &rs);
-	double similarity(const item &e);
+	double similarity1(const item &e);
+	double similarity2(const item &e);
 	int print();
 
 	static double similarity(const string &s1, const string &s2);

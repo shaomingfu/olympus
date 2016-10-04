@@ -75,7 +75,25 @@ int item::print()
 	return 0;
 }
 
-double item::similarity(const item &e)
+double item::similarity1(const item &e)
+{
+	if(words.size() == 0 || e.words.size() == 0) return 0;
+
+	double s0 = similarity(words[0], e.words[0]);
+	if(s0 < 0.8) return 0;
+
+	double sm = 0;
+	for(int i = 0; i < words.size() && i < e.words.size(); i++)
+	{
+		sm += similarity(words[i], e.words[i]);
+	}
+
+	if(sm >= words.size() - 0.2) return 1.0;
+	if(sm >= e.words.size() - 0.2) return 1.0;
+	return 0;
+}
+
+double item::similarity2(const item &e)
 {
 	if(words.size() == 0 || e.words.size() == 0) return 0;
 
@@ -92,7 +110,6 @@ double item::similarity(const item &e)
 		for(int j = 0; j < n; j++)
 		{
 			vv[i][j] = similarity(words[i], e.words[j]);
-			//printf("%s %s -> %lf\n", words[i].c_str(), e.words[j].c_str(), vv[i][j]);
 		}
 	}
 
@@ -127,12 +144,18 @@ double item::similarity(const item &e)
 	int min = m < n ? m : n;
 	int max = m > n ? m : n;
 
-	if(sm >= min) return 1.0;
-	if(sm >= max - 0.5) return 1.0;
+	if(sm / max >= 0.9) return 1.0;
+	if(sm > max - 0.5) return 1.0;
 
-	double ss = sm / (m > n ? m : n);
-	//if(ss > 0.1) printf("|%s| <-> |%s| -> %.6lf\n", name.c_str(), e.name.c_str(), ss);
-	return ss;
+	double sm1 = 0;
+	for(int i = 0; i < words.size() && i < e.words.size(); i++)
+	{
+		sm1 += similarity(words[i], e.words[i]);
+	}
+
+	if(sm1 >= 1.99 && sm1 > min - 0.2) return 1.0;
+
+	return 0;
 }
 
 double item::similarity(const string &s1, const string &s2)

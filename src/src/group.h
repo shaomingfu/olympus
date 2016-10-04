@@ -23,6 +23,7 @@ public:
 	int replace(const string &file);
 	int build();
 	int clust();
+	int clust(const vector<int> &v);
 	int parse();
 	int print();
 };
